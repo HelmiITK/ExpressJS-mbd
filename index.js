@@ -50,17 +50,15 @@ app.post('/ikan', (req, res) => {
 })
 
 // Delete ikan by ID
-app.delete('/ikan', (req, res) => {
-    const { body } = req
-    const sql = `CALL DeleteIkan(${body.id_ikan})`
+app.delete('/ikan/:id_ikan', (req, res) => {
+    const { params } = req
+    const sql = `CALL DeleteIkan(${params.id_ikan})`
 
-    db.query(sql, (err, finds) => {
-        if (err) throw err
-
-        if (finds) {
-            response(200, finds, "Data Ikan Berhasil Dihapus", res)
-        } else {
+    db.query(sql, (err, result) => {
+        if (err) {
             response(404, "Ikan Not Found", "error", res)
+        } else {
+            response(200, result, "Data Ikan Berhasil Dihapus", res)
         }
     })
 })
@@ -105,7 +103,6 @@ app.put('/penyortir', (req, res) => {
             } else {
                 response(404, "Penyortir Tidak Ditemukan", "error", res)
             }
-
         })
 })
 
@@ -123,9 +120,6 @@ app.post('/penyortir', (req, res) => {
     })
 })
 
-app.delete('/delete', (req, res) => {
-    res.send('halaman delete')
-})
 
 // Delete Karyawan by id and nama penyortir
 app.delete('/penyortir/:id_penyortir/:nama_penyortir', (req, res) => {
@@ -140,7 +134,6 @@ app.delete('/penyortir/:id_penyortir/:nama_penyortir', (req, res) => {
         }
     })
 })
-
 
 
 // =========================TABEL KOLAM SORTIR==========================
@@ -163,6 +156,26 @@ app.get('/kolam_sortir/:id_tempat', (req, res) => {
         if (err) throw err
 
         response(200, result, 'SUCCESS', res)
+    })
+})
+
+// Update kapasitas Kolam
+app.put('/kolam_sortir', (req, res) => {
+    const { body } = req
+    const sql = `CALL UpdateKapasitasKolam(${body.id_tempat}, ${body.kapasitas_kolam})`
+
+    db.query(sql, (err, update) => {
+        if (err) response(500, "invalid", "error", res)
+
+        if (update.affectedRows) {
+            const data = {
+                isSuccess: update.affectedRows,
+                isValidation: update.protocol41,
+            }
+            response(201, data, 'Kapasitas Kolam Berhasil Diperbarui', res)
+        } else {
+            response(404, "Kolam Sortir Tidak Ditemukan", "error", res)
+        }
     })
 })
 
