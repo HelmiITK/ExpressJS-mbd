@@ -17,6 +17,8 @@ app.get('/', (req, res) => {
 app.get('/ikan', (req, res) => {
     db.query("CALL getAllikan()", (error, result) => {
         console.log({ dataIkan: result })
+        if (error) throw error
+
         response(200, result, "success", res)
     })
 })
@@ -175,6 +177,37 @@ app.put('/kolam_sortir', (req, res) => {
             response(201, data, 'Kapasitas Kolam Berhasil Diperbarui', res)
         } else {
             response(404, "Kolam Sortir Tidak Ditemukan", "error", res)
+        }
+    })
+})
+
+
+// =========================TABEL DETAIL PENYORTIRAN==============================
+
+// get All detail penyortiran
+app.get('/detail_penyortiran', (req, res) => {
+    const sql = `CALL getALLDetailPenyortiran()`
+
+    db.query(sql, (err, result) => {
+        console.log({ DataDetail: result })
+        if (err) throw err
+
+        response(200, result, 'SUCCESS', res)
+    })
+})
+
+// get detail penyortiran by id
+app.get('/detail_penyortiran/:id_detail_penyortiran', (req, res) => {
+    const { params } = req
+    const sql = `CALL getDetailPenyortiranById(${params.id_detail_penyortiran})`
+
+    db.query(sql, (err, result) => {
+        console.log({ databyID: result })
+
+        if (err) {
+            response(404, 'Data Detail Tidak Ditemukan', 'error', res)
+        } else {
+            response(200, result, 'SUCCESS', res)
         }
     })
 })
