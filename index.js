@@ -45,8 +45,24 @@ app.post('/ikan', (req, res) => {
                                     '${body.kondisi_ikan}')`,
         (error, result) => {
             console.log(error)
-            response(201, result, "success", res)
+            response(201, result, "Data Ikan Berhasil Ditambahkan", res)
         })
+})
+
+// Delete ikan by ID
+app.delete('/ikan', (req, res) => {
+    const { body } = req
+    const sql = `CALL DeleteIkan(${body.id_ikan})`
+
+    db.query(sql, (err, finds) => {
+        if (err) throw err
+
+        if (finds) {
+            response(200, finds, "Data Ikan Berhasil Dihapus", res)
+        } else {
+            response(404, "Ikan Not Found", "error", res)
+        }
+    })
 })
 
 
@@ -78,8 +94,18 @@ app.put('/penyortir', (req, res) => {
 
     db.query(`CALL UpdateJabatanPenyortir(${body.id_penyortir}, '${body.jabatan}')`,
         (err, update) => {
-            if (err) throw err
-            response(200, update, 'Jabatan Berhasil Diubah', res)
+            if (err) response(500, "invalid", "error", res)
+
+            if (update.affectedRows) {
+                const data = {
+                    isSuccess: update.affectedRows,
+                    isValidation: update.protocol41,
+                }
+                response(200, data, 'Jabatan Berhasil Diubah', res)
+            } else {
+                response(404, "Penyortir Tidak Ditemukan", "error", res)
+            }
+
         })
 })
 
@@ -101,6 +127,21 @@ app.delete('/delete', (req, res) => {
     res.send('halaman delete')
 })
 
+// Delete Karyawan by id and nama penyortir
+app.delete('/penyortir/:id_penyortir/:nama_penyortir', (req, res) => {
+    const { params } = req
+    const sql = `CALL delete_penyortir_by_id_and_name(${params.id_penyortir}, '${params.nama_penyortir}')`
+
+    db.query(sql, (err, result) => {
+        if (err) {
+            response(404, 'Karyawan Not Found', 'error', res)
+        } else {
+            response(200, result, 'Data Berhasil Dihapus', res)
+        }
+    })
+})
+
+
 
 // =========================TABEL KOLAM SORTIR==========================
 // get All kolam sortir
@@ -111,23 +152,21 @@ app.get('/kolam_sortir', (req, res) => {
     })
 })
 
-// get kolam by id
+
+// get kolam sortir by id
 app.get('/kolam_sortir/:id_tempat', (req, res) => {
     const idTempat = req.params.id_tempat
     const sql = `CALL getKolamById(${idTempat})`
 
-    db.query(sql, (err, finds) => {
+    db.query(sql, (err, result) => {
+        console.log(result)
         if (err) throw err
-        response(200, finds, 'SUCCESS', res)
+
+        response(200, result, 'SUCCESS', res)
     })
 })
 
 
-
-
-app.delete('/delete', (req, res) => {
-    res.send('halaman delete')
-})
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
