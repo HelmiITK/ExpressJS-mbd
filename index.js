@@ -54,13 +54,15 @@ app.post('/ikan', (req, res) => {
 // Delete ikan by ID
 app.delete('/ikan/:id_ikan', (req, res) => {
     const { params } = req
-    const sql = `CALL DeleteIkan(${params.id_ikan})`
+    const sql = `CALL DeleteIkanByID('${params.id_ikan}')`
 
     db.query(sql, (err, result) => {
-        if (err) {
-            response(404, "Ikan Not Found", "error", res)
+        if (!err && result[0][0].result === "Ikan Tidak Ada Di Database") {
+            response(404, "Ikan NOT FOUND", "error", res)
+        } else if (!err) {
+            response(200, result, "SUCCESS", res)
         } else {
-            response(200, result, "Data Ikan Berhasil Dihapus", res)
+            response(500, "Internal Server Error", "error", res)
         }
     })
 })
@@ -77,16 +79,23 @@ app.get('/penyortir', (req, res) => {
 
 // get penyortir by id
 app.get('/penyortir/:id_penyortir', (req, res) => {
-    const id_penyortir = req.params.id_penyortir
-    const sql = `CALL getPenyortirById(${id_penyortir})`
+    const { params } = req
+    const sql = `CALL CheckKaryawanByID('${params.id_penyortir}')`
 
-    db.query(sql, (error, fields) => {
-        console.log({ karyawan: fields })
-
-        if (error) throw error
-        response(200, fields, 'SUCCESS', res)
+    db.query(sql, (err, result) => {
+        //apakah ini tidak terjadi error dan apakah result itu mengandung pesan 'Karyawan tidak ditemukan' 
+        //ini itu ngebaca penyesuannya dari database query datagrid yang kita buat dan jika pesan itu sesuai 
+        //dan sama maka berikan respon eror 404
+        if (!err && result[0][0].result === "Karyawan tidak ditemukan") {
+            response(404, "Karyawan tidak ditemukan", "error", res)
+        } else if (!err) {
+            response(200, result, "SUCCESS", res)
+        } else {
+            response(500, "Internal Server Error", "error", res)
+        }
     })
 })
+
 
 // Update Data Jabatan Karyawan Penyortir
 app.put('/penyortir', (req, res) => {
@@ -132,7 +141,7 @@ app.delete('/penyortir/:id_penyortir/:nama_penyortir', (req, res) => {
         if (err) {
             response(404, 'Karyawan Not Found', 'error', res)
         } else {
-            response(200, result, 'Data Berhasil Dihapus', res)
+            response(200, 'Karyawan Berhasil Dihapus', 'SUCCESS', res)
         }
     })
 })
@@ -147,17 +156,19 @@ app.get('/kolam_sortir', (req, res) => {
     })
 })
 
-
-// get kolam sortir by id
+// get data kolam by id 
 app.get('/kolam_sortir/:id_tempat', (req, res) => {
-    const idTempat = req.params.id_tempat
-    const sql = `CALL getKolamById(${idTempat})`
+    const { params } = req
+    const sql = `CALL CheckKolamByID('${params.id_tempat}')`
 
     db.query(sql, (err, result) => {
-        console.log(result)
-        if (err) throw err
-
-        response(200, result, 'SUCCESS', res)
+        if (!err && result[0][0].result === "Kolam sortir tidak ditemukan") {
+            response(404, "Kolam Not Found", "error", res)
+        } else if (!err) {
+            response(200, result, "SUCCESS", res)
+        } else {
+            response(500, "Internal Server Error", "error", res)
+        }
     })
 })
 
