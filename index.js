@@ -1,55 +1,45 @@
+require('dotenv').config()
+
 const express = require('express')
 const bodyParser = require('body-parser')
-const response = require('./response')
-const db = require('./connection')
+
+const response = require('./src/res/response')
+const fishRouter = require('./src/routes/fishRoute')
+const employeRouter = require('./src/routes/employeRoute')
+const sortingPoolRouter = require('./src/routes/sortingPoolRoute')
+
+
+const PORT = process.env.PORT || 5000
 
 const app = express()
-const port = 3005
 
 app.use(bodyParser.json())
 
-app.get('/', (req, res) => {
-    res.send('halaman utama')
-})
-
 // ===========================TABEL IKAN==============================
-// procedure getAllikan
-app.get('/ikan', (req, res) => {
-    db.query("CALL getAllikan()", (error, result) => {
-        console.log({ dataIkan: result })
-        if (error) throw error
+app.use(fishRouter)
 
-        response(200, result, "success", res)
-    })
-})
+// ===========================TABEL PENYORTIR=========================
+app.use(employeRouter)
 
-// procedure getikanbjenis_ikan
-app.get('/ikan/:jenis_ikan', (req, res) => {
-    const jenis_ikan = req.params.jenis_ikan
-    const sql = `CALL getikanbyjenis_ikan ('${jenis_ikan}')`
+// ===========================TABEL KOLAM SORTIR======================
+app.use(sortingPoolRouter)
 
-    db.query(sql, (err, finds) => {
-        if (err) throw err
-        response(200, finds, 'SUCCESS', res)
-    })
-})
+// Handle not found page anything in api
 
-// Tambah Ikan baru 
-app.post('/ikan', (req, res) => {
-    const { body } = req
+// app.use((req, res, next) => {
+//     res.status(404).send('(404 NOT FOUND) L🤔L');
+// });
 
-    db.query(`CALL InsertNewIkan(
-                                    '${body.nama_ikan}', 
-                                    '${body.berat}', 
-                                    '${body.panjang}', 
-                                    '${body.jenis_ikan}', 
-                                    '${body.tanggal_penyortiran}',
-                                    '${body.kondisi_ikan}')`,
-        (error, result) => {
-            console.log(error)
-            response(201, result, "Data Ikan Berhasil Ditambahkan", res)
-        })
-})
+app.use((req, res, next) => {
+    response(404, '404 NOT FOUND !!! 😭', 'error', res);
+});
+
+// ==================================================================
+
+
+
+
+
 
 // Delete ikan by ID
 app.delete('/ikan/:id_ikan', (req, res) => {
@@ -70,12 +60,12 @@ app.delete('/ikan/:id_ikan', (req, res) => {
 
 // ========================TABEL PENYORTIR=========================
 // get all karyawan penypertir
-app.get('/penyortir', (req, res) => {
-    db.query("CALL getALLPenyortir()", (error, result) => {
-        console.log({ dataIkan: result })
-        response(200, result, "success", res)
-    })
-})
+// app.get('/penyortir', (req, res) => {
+//     db.query("CALL getALLPenyortir()", (error, result) => {
+//         console.log({ dataIkan: result })
+//         response(200, result, "success", res)
+//     })
+// })
 
 // get penyortir by id
 app.get('/penyortir/:id_penyortir', (req, res) => {
@@ -159,7 +149,7 @@ app.get('/kolam_sortir', (req, res) => {
 // get data kolam by id 
 app.get('/kolam_sortir/:id_tempat', (req, res) => {
     const { params } = req
-    const sql = `CALL CheckKolamByID('${params.id_tempat}')`
+    const sql = `CALL CheckKolamByID(${params.id_tempat})`
 
     db.query(sql, (err, result) => {
         if (!err && result[0][0].result === "Kolam sortir tidak ditemukan") {
@@ -185,7 +175,7 @@ app.put('/kolam_sortir', (req, res) => {
                 isSuccess: update.affectedRows,
                 isValidation: update.protocol41,
             }
-            response(201, data, 'Kapasitas Kolam Berhasil Diperbarui', res)
+            response(200, data, 'Kapasitas Kolam Berhasil Diperbarui', res)
         } else {
             response(404, "Kolam Sortir Tidak Ditemukan", "error", res)
         }
@@ -224,7 +214,7 @@ app.get('/detail_penyortiran/:id_detail_penyortiran', (req, res) => {
 })
 
 
-
-app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
+// PORT 
+app.listen(PORT, () => {
+    console.log(`Example app listening on port ${PORT}`)
 })
