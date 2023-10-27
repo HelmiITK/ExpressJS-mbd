@@ -30,7 +30,7 @@ const getFish = async (req, res) => {
         } else {
             // tampilkan semua ikan
             const [fishData] = await fishModel.selectAll()
-            return response(200, fishData, 'success', res)
+            return response(200, fishData[0], 'success', res)
         }
 
     } catch (error) {
