@@ -39,7 +39,7 @@ const getFish = async (req, res) => {
     }
 }
 
-// create/add fish into database sortir_ikan
+// create/add fish into database sortir_ikan //add optimasi in if else
 const addfish = async (req, res) => {
     try {
         const { nama_ikan, berat, panjang, jenis_ikan, tanggal_penyortiran, kondisi_ikan } = req.body
