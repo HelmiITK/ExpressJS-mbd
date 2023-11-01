@@ -7,7 +7,7 @@ const response = require('./src/res/response')
 const fishRouter = require('./src/routes/fishRoute')
 const employeRouter = require('./src/routes/employeRoute')
 const sortingPoolRouter = require('./src/routes/sortingPoolRoute')
-
+const sortingDetailsRouter = require('./src/routes/sortingDetailsRoute')
 
 const PORT = process.env.PORT || 5000
 
@@ -23,6 +23,11 @@ app.use(employeRouter)
 
 // ===========================TABEL KOLAM SORTIR======================
 app.use(sortingPoolRouter)
+
+// ===========================TABEL DETAIL PENYORTIRAN================
+app.use(sortingDetailsRouter)
+
+
 
 // Handle not found page anything in api
 
