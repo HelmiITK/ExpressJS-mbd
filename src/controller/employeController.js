@@ -45,7 +45,7 @@ const getEmployes = async (req, res) => {
 const updatePositionEmploye = async (req, res) => {
     try {
         const { id_employe, position } = req.body
-        console.log(id_employe, position)
+        // console.log(id_employe, position)
 
         if (!id_employe && !position) {
             return (
@@ -79,7 +79,58 @@ const updatePositionEmploye = async (req, res) => {
     }
 }
 
+// add employer 
+const handleAddEmlpoyer = async (req, res) => {
+    try {
+        const { id_perusahaan, nama_penyortir, jabatan } = req.body
+
+        if (!id_perusahaan && !nama_penyortir && !jabatan) {
+            return response(400, 'All data must be completed', 'error', res)
+        } else if (!id_perusahaan) {
+            return response(400, 'Please input id_perusahaan', 'error', res)
+        } else if (!nama_penyortir) {
+            return response(400, 'Please input nama_penyortir', 'error', res)
+        } else if (!jabatan) {
+            return response(400, 'Please input jabatan', 'error', res)
+        } else {
+            const [addDataEmploye] = await employeModel.addEmployer(id_perusahaan, nama_penyortir, jabatan)
+            response(201, addDataEmploye, 'Data added employe successfully', res)
+        }
+
+    } catch (error) {
+        response(500, 'Internal server error', 'error', res)
+    }
+}
+
+// delete employer
+const handleDeleteEmployer = async (req, res) => {
+    try {
+        const { id_penyortir, nama_penyortir } = req.body
+
+        if (!id_penyortir && !nama_penyortir) {
+            return response(400, 'Please Input All Data Before Delete Employe', 'error', res)
+        } else if (!id_penyortir) {
+            return response(400, 'Please input id_penyortir before delete employe', 'error', res)
+        } else if (!nama_penyortir) {
+            return response(400, 'Please input nama_penyortir before delete employe', 'error', res)
+        } else {
+            const [cekEmploye] = await employeModel.selectEmployeByID(id_penyortir)
+            if (cekEmploye[0][0].result === "Karyawan tidak ditemukan") {
+                return response(404, 'Employe NOT FOUND', 'error', res)
+            }
+
+            const [deleteEmploye] = await employeModel.deleteEmployer(id_penyortir, nama_penyortir)
+            response(200, deleteEmploye[0], 'Delete Employe Successfully', res)
+
+        }
+    } catch (error) {
+        response(500, 'Internal Server Error', 'error', res)
+    }
+}
+
 module.exports = {
     getEmployes,
-    updatePositionEmploye
+    updatePositionEmploye,
+    handleAddEmlpoyer,
+    handleDeleteEmployer
 }

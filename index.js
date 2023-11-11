@@ -41,6 +41,10 @@ app.use((req, res, next) => {
 
 // ==================================================================
 
+// PORT 
+app.listen(PORT, () => {
+    console.log(`Example app listening on port ${PORT}`)
+})
 
 
 
@@ -219,7 +223,4 @@ app.get('/detail_penyortiran/:id_detail_penyortiran', (req, res) => {
 })
 
 
-// PORT 
-app.listen(PORT, () => {
-    console.log(`Example app listening on port ${PORT}`)
-})
+

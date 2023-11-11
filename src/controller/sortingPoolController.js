@@ -4,7 +4,7 @@ const response = require('../res/response')
 const getSortingPool = async (req, res) => {
     try {
         const { id_tempat } = req.query
-        console.log(id_tempat)
+        // console.log(id_tempat)
 
         if (id_tempat) {
             const [poolData] = await sortingPoolModel.getPoolById(id_tempat)
@@ -25,7 +25,7 @@ const getSortingPool = async (req, res) => {
 const handleUpdatePool = async (req, res) => {
     try {
         const { id_tempat, kapasitas_kolam } = req.body
-        console.log(id_tempat, kapasitas_kolam)
+        // console.log(id_tempat, kapasitas_kolam)
 
         if (!id_tempat && !kapasitas_kolam) {
             return (
